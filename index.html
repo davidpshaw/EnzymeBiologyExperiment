@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="style.css">
+
+    <title>Enzyme Reaction Rates - Number Generator</title>
+</head>
+
+<body>
+
+    <form>
+        <div class="container">
+            <div class="row">
+                <!-- title -->
+                <div class="col-12" style="text-align: center;">
+                    <h4>Investigating Enzyme Reaction Rates</h4>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6">
+
+                    <div class="card">
+                        <!-- type chooser -->
+                        <div class="card-body">
+                            <h5 class="card-title">Choose Mode</h5>
+                            <p class="card-text"></p>
+                            <select id="modeSelect" class="custom-select my-1 mr-sm-2">
+                                <option value="1" selected>Baseline Procedure</option>
+                                <option value="2">Inhibitor Procedure</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        &nbsp;
+                    </div>
+
+                    <div class="card">
+                        <!-- stopwatch -->
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title">Stopwatch</h5>
+                                </div>
+                                <div class="col">
+                                    <div id="stopWatchSpinner" class="spinner-border" role="status" hidden>
+                                        <span class="sr-only"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="card-text">You can use this to track timing on your data collection</p>
+                            <span id="stopwatchtime" class="card-text"
+                                style="font-size: larger; font-weight: bold;">0</span> sec
+                            <br />
+                            <br />
+                            <button id="startWatchButton" type="button" class="btn btn-primary">Start</button>
+                            <button id="pauseStopWatchButton" type="button" class="btn btn-secondary"
+                                disabled>Pause</button>
+                            <button id="resetWatchAndExperiment" type="button" class="btn btn-secondary">Reset
+                                Experiment</button>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-6">
+                    <div class="card border">
+                        <!-- random generator -->
+                        <div class="card-body">
+                            <h5 class="card-title">Data Collector</h5>
+                            <p class="card-text ">
+                                Each press of the button will generate a random number<br />
+                                Green = Number is new<br />
+                                Red = Number previously seen<br />
+                                Yellow = Number inhibited<br />
+                            </p>
+                            <span id="result" class="random-result">0</span>
+                            <br />
+                            <button id="generateButton" type="button" class="btn btn-primary" disabled>Generate</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                &nbsp;
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table id="resultsTable" class="table table-bordered table-sm">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </form>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+
+    <script src="functions.js"></script>
+</body>
+
+</html>
