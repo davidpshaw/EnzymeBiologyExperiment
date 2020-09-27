@@ -4,9 +4,20 @@ window.appConfig = {
   bracket_ranges: [[1, 10], [11, 30], [31, 60], [61, 90], [91, 120], [121, 150]], // these are used to make the labels
   brackets: [],
 
-  MAX_INT: 50, // upper range of random numbers
-  MAX_GOOD_VALUE: 50, // numbers between MAX_GOOD_VALUE and MAX_INT are Inhibitors
-  MAX_TIMER_VALUE: 0, // time in seconds that we collect data in a run, will be set in initializeDataStructures below
+  modes: { // these are the different experiment modes that the user can pick, and the associated parameters
+    baseline: {
+      MAX_INT: 50,
+      MAX_GOOD_VALUE: 50
+    },
+    inhibitor: {
+      MAX_INT: 80,
+      MAX_GOOD_VALUE: 50
+    }
+  },
+
+  MAX_INT: 50, // default value for upper range of random numbers, changed by mode switch
+  MAX_GOOD_VALUE: 50, // default value for numbers between MAX_GOOD_VALUE and MAX_INT are Inhibitors, changed by mode switch
+  MAX_TIMER_VALUE: 0 // time in seconds that we collect data in a run, changed by editing bracket_ranges
 }
 
 window.appData = {
@@ -18,20 +29,26 @@ window.appData = {
   timerId: null
 }
 
+/**
+ * Initialize the values in appConfig and appData to clean empty values
+ */
 const initializeDataStructures = () => {
   const appConfig = window.appConfig
   const appData = window.appData
 
+  appData.found_results = {}
+
   // init the brackets
+  appConfig.brackets = []
   appConfig.bracket_ranges.forEach(range => {
     appConfig.brackets.push(bracketNameForRange(range))
   })
 
   // init the MAX_TIMER_VALUE
   appConfig.MAX_TIMER_VALUE = appConfig.bracket_ranges[appConfig.bracket_ranges.length - 1][1]
-  console.log(appConfig.MAX_TIMER_VALUE)
 
   // init bracket_data
+  appData.bracket_data = {}
   appConfig.brackets.forEach(bracket => {
     appData.bracket_data[bracket] = {}
     appConfig.colors.forEach(color => {
@@ -39,13 +56,13 @@ const initializeDataStructures = () => {
     })
   })
   // init bracket_data_rows
+  appData.bracket_data_rows = {}
   appConfig.colors.forEach(color => {
     appData.bracket_data_rows[color] = {}
     appConfig.brackets.forEach(bracket => {
       appData.bracket_data_rows[color][bracket] = 0
     })
   })
-
 }
 
 const bracketNameForRange = (range) => {
@@ -54,11 +71,6 @@ const bracketNameForRange = (range) => {
   const label = `${min}-${max} sec`
   return label
 }
-
-const initializeApplication = () => {
-  initializeDataStructures()
-}
-initializeApplication()
 
 // below are the app functions
 const getRandomInt = (max) => {
@@ -122,12 +134,11 @@ const setDataGatherComplete = () => {
   document.getElementById('startWatchButton').disabled = true
 }
 
+/**
+ * Called to reset all the data
+ */
 const resetResults = () => {
-  const appData = window.appData
-  const appConfig = window.appConfig
-  for (var i = 1; i <= appConfig.MAX_INT; i++) {
-    appData.found_results[i] = ((i > appConfig.MAX_GOOD_VALUE) ? 1 : 0)
-  }
+  initializeDataStructures()
   document.getElementById('result').innerText = ''
   document.getElementById('result').style.backgroundColor = 'white'
 
@@ -217,20 +228,10 @@ const makeTableRow = (label, valueArray) => {
  */
 const setMode = (newValue) => {
   const appConfig = window.appConfig
-  switch (newValue) {
-    case '1':
-      appConfig.MAX_INT = 50
-      appConfig.MAX_GOOD_VALUE = 50
-      break
+  const newMode = appConfig.modes[newValue]
+  appConfig.MAX_INT = newMode.MAX_INT
+  appConfig.MAX_GOOD_VALUE = newMode.MAX_GOOD_VALUE
 
-    case '2':
-      appConfig.MAX_INT = 80
-      appConfig.MAX_GOOD_VALUE = 50
-      break
-    default:
-      appConfig.MAX_INT = 500
-      appConfig.MAX_GOOD_VALUE = 0
-  }
   resetWatch()
   resetResults()
   console.log(`MAX_INT: ${appConfig.MAX_INT}, MAX_GOOD_VALUE: ${appConfig.MAX_GOOD_VALUE}`)
@@ -263,7 +264,7 @@ const logNumberBracketColor = (currentTime, color) => {
   var bracketName
   for (var range of appConfig.bracket_ranges) {
     const rangeMax = range[1]
-    if (currentTime < rangeMax) {
+    if (currentTime <= rangeMax) {
       bracketName = bracketNameForRange(range)
       break
     }
