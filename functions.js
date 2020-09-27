@@ -1,10 +1,12 @@
 
 window.appConfig = {
+  colors: ['green', 'yellow', 'red'],
+  bracket_ranges: [[1, 10], [11, 30], [31, 60], [61, 90], [91, 120], [121, 150]], // these are used to make the labels
+  brackets: [],
+
   MAX_INT: 50, // upper range of random numbers
   MAX_GOOD_VALUE: 50, // numbers between MAX_GOOD_VALUE and MAX_INT are Inhibitors
-  MAX_TIMER_VALUE: 360, // time in seconds that we collect data in a run
-  colors: ['green', 'yellow', 'red'],
-  brackets: ['1-10 sec', '11-30 sec', '31-60 sec', '61-90 sec', '91-120 sec', '121-180 sec', '181-360 sec']
+  MAX_TIMER_VALUE: 0, // time in seconds that we collect data in a run, will be set in initializeDataStructures below
 }
 
 window.appData = {
@@ -19,6 +21,16 @@ window.appData = {
 const initializeDataStructures = () => {
   const appConfig = window.appConfig
   const appData = window.appData
+
+  // init the brackets
+  appConfig.bracket_ranges.forEach(range => {
+    appConfig.brackets.push(bracketNameForRange(range))
+  })
+
+  // init the MAX_TIMER_VALUE
+  appConfig.MAX_TIMER_VALUE = appConfig.bracket_ranges[appConfig.bracket_ranges.length - 1][1]
+  console.log(appConfig.MAX_TIMER_VALUE)
+
   // init bracket_data
   appConfig.brackets.forEach(bracket => {
     appData.bracket_data[bracket] = {}
@@ -33,6 +45,14 @@ const initializeDataStructures = () => {
       appData.bracket_data_rows[color][bracket] = 0
     })
   })
+
+}
+
+const bracketNameForRange = (range) => {
+  const min = range[0]
+  const max = range[1]
+  const label = `${min}-${max} sec`
+  return label
 }
 
 const initializeApplication = () => {
@@ -239,25 +259,16 @@ const findANumber = () => {
  */
 const logNumberBracketColor = (currentTime, color) => {
   const appData = window.appData
+  const appConfig = window.appConfig
   var bracketName
-  if (currentTime < 11) {
-    bracketName = '1-10 sec'
-  } else if (currentTime <= 30) {
-    bracketName = '11-30 sec'
-  } else if (currentTime <= 60) {
-    bracketName = '31-60 sec'
-  } else if (currentTime <= 90) {
-    bracketName = '61-90 sec'
-  } else if (currentTime <= 120) {
-    bracketName = '91-120 sec'
-  } else if (currentTime <= 180) {
-    bracketName = '121-180 sec'
-  } else if (currentTime <= 360) {
-    bracketName = '181-360 sec'
-  } else {
-    console.log(`No bracket exists for time ${currentTime}`)
-    return
+  for (var range of appConfig.bracket_ranges) {
+    const rangeMax = range[1]
+    if (currentTime < rangeMax) {
+      bracketName = bracketNameForRange(range)
+      break
+    }
   }
+
   appData.bracket_data[bracketName][color] += 1
   appData.bracket_data_rows[color][bracketName] += 1
 }
