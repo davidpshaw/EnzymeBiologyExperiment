@@ -21,6 +21,7 @@ window.appConfig = {
 }
 
 window.appData = {
+  raw_randoms: [], // all randoms, no filtering
   found_results: {}, // raw results, counting number of times a number is found
   bracket_data: {}, // results from a run, sorted by bracket then by color
   bracket_data_rows: {}, // results from a run, sorted by color then by bracket
@@ -63,6 +64,8 @@ const initializeDataStructures = () => {
       appData.bracket_data_rows[color][bracket] = 0
     })
   })
+  // reset the raw results (used for debugging)
+  appData.raw_randoms = []
 }
 
 const bracketNameForRange = (range) => {
@@ -239,11 +242,13 @@ const setMode = (newValue) => {
 
 /**
  * Generate another data point, add it to the results, and return it
+ * @returns [number, color] the new number and the associated color
  */
 const findANumber = () => {
   const appConfig = window.appConfig
   const appData = window.appData
   const newNumber = getRandomInt(appConfig.MAX_INT)
+  appData.raw_randoms.push(newNumber)
   var existing = appData.found_results[newNumber] || 0
   appData.found_results[newNumber] = existing + 1
 
@@ -251,7 +256,7 @@ const findANumber = () => {
   logNumberBracketColor(appData.watchTimerValue, color)
   // console.log(`existing is ${existing}, hasBeenFound was ${hasNumberBeenFoundAlready(newNumber)},Color is ${color}`)
 
-  return newNumber
+  return [newNumber, color]
 }
 /**
  * Add the color to the appropriate bracketed data for later reporting
@@ -278,13 +283,12 @@ const logNumberBracketColor = (currentTime, color) => {
 $('#generateButton').on('click', function (event) {
   const appConfig = window.appConfig
   event.preventDefault() // To prevent following the link (optional)
-  const newNumber = findANumber()
+  const numberAndColor = findANumber()
+  const newNumber = numberAndColor[0]
+  var color = numberAndColor[1]
   document.getElementById('result').innerText = newNumber
-  if (hasNumberBeenFoundAlready(newNumber)) {
-    document.getElementById('result').style.backgroundColor = (newNumber > appConfig.MAX_GOOD_VALUE) ? 'goldenrod' : 'red'
-  } else {
-    document.getElementById('result').style.backgroundColor = 'green'
-  }
+  color = (color === 'yellow') ? 'goldenrod' : color
+  document.getElementById('result').style.backgroundColor = color
 })
 $('#startWatchButton').on('click', function (event) {
   event.preventDefault() // To prevent following the link (optional)
